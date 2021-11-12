@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
@@ -15,9 +16,14 @@ namespace RestaurantRaterMVC.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View();
+            List<RestaurantListItem> restaurants = _context.Restaurants.Select(r => new RestaurantListItem()
+            {
+                Name = r.Name,
+                Score = r.Score,
+            }).ToList();
+            return View(restaurants);
         }
 
 
@@ -31,8 +37,8 @@ namespace RestaurantRaterMVC.Controllers
                 Id = restaurant.Id,
                 Name = restaurant.Name,
                 Location = restaurant.Location,
-                // Ratings = _context.Ratings.Where(r => r.RestaurantId == id).Select(r => r.Score).ToList(),
-                Ratings = restaurant.Ratings.Select(r => r.Score).ToList(),
+                // Score = _context.Ratings.Where(r => r.RestaurantId == id).Select(r => r.Score).Sum(),
+                Score = restaurant.Score,
             };
             return View(restaurantDetail);
         }

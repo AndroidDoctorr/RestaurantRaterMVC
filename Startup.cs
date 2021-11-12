@@ -27,7 +27,7 @@ namespace RestaurantRaterMVC
         {
             services.AddControllersWithViews();
             services.AddHttpsRedirection(options => options.HttpsPort = 443);
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<RestaurantDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")
                 )

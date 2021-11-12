@@ -4,6 +4,7 @@ namespace RestaurantRaterMVC.Models.Restaurant
 {
     public class RestaurantListItem
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         [Display(Name = "Rating")]
         public double Score { get; set; }
