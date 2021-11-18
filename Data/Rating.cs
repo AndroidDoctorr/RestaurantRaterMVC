@@ -11,6 +11,7 @@ namespace RestaurantRaterMVC.Data
         [ForeignKey("Restaurant")]
         public int RestaurantId { get; set; }
         [Required]
+        [Range(1, 5)]
         public double Score { get; set; }
         public virtual Restaurant Restaurant { get; set; }
     }

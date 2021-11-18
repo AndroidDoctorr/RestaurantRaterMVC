@@ -8,6 +8,7 @@ namespace RestaurantRaterMVC.Models.Rating
         [Display(Name = "Restaurant")]
         public int RestaurantId { get; set; }
         [Required]
+        [Range(1, 5)]
         public double Score { get; set; }
     }
 }

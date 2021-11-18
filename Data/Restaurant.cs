@@ -14,14 +14,13 @@ namespace RestaurantRaterMVC.Data
         [Required]
         [MaxLength(100)]
         public string Location { get; set; }
-        [Display(Name = "Rating")]
         public double Score
         {
             get
             {
-                return Ratings.Select(r => r.Score).Sum() / Ratings.Count;
+                return Ratings.Count > 0 ? Ratings.Select(r => r.Score).Sum() / Ratings.Count : 0;
             }
         }
-        public virtual List<Rating> Ratings { get; set; }
+        public virtual List<Rating> Ratings { get; set; } = new List<Rating>();
     }
 }

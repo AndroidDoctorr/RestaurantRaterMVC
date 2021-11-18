@@ -22,6 +22,7 @@ namespace RestaurantRaterMVC.Controllers
                 RestaurantName = r.Restaurant.Name,
                 Score = r.Score,
             }).ToList();
+
             return View(ratings);
         }
 

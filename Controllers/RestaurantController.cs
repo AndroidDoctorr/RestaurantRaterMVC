@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RestaurantRaterMVC.Data;
 using RestaurantRaterMVC.Models.Restaurant;
 
@@ -16,30 +16,40 @@ namespace RestaurantRaterMVC.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            List<RestaurantListItem> restaurants = _context.Restaurants.Select(r => new RestaurantListItem()
+            List<Restaurant> restaurants = await _context.Restaurants.ToListAsync();
+            foreach (Restaurant restaurant in restaurants)
             {
+                restaurant.Ratings = await _context.Ratings.Where(r => r.RestaurantId == restaurant.Id).ToListAsync();
+            }
+            List<RestaurantListItem> restaurantList = restaurants.Select(r => new RestaurantListItem()
+            {
+                Id = r.Id,
                 Name = r.Name,
-                Score = r.Score,
+                Score = r.Ratings.Count > 0 ? r.Ratings.Select(r => r.Score).Sum() / r.Ratings.Count : 0,
             }).ToList();
-            return View(restaurants);
+            return View(restaurantList);
         }
 
-
+        [ActionName("Details")]
         public async Task<IActionResult> Restaurant(int id)
         {
-            Restaurant restaurant = await _context.Restaurants.FindAsync(id);
+            Restaurant restaurant = await _context.Restaurants
+                .Include(r => r.Ratings)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
             if (restaurant == null)
                 return RedirectToAction(nameof(Index));
+
             RestaurantDetail restaurantDetail = new RestaurantDetail()
             {
                 Id = restaurant.Id,
                 Name = restaurant.Name,
                 Location = restaurant.Location,
-                // Score = _context.Ratings.Where(r => r.RestaurantId == id).Select(r => r.Score).Sum(),
                 Score = restaurant.Score,
             };
+
             return View(restaurantDetail);
         }
 
@@ -65,21 +75,25 @@ namespace RestaurantRaterMVC.Controllers
 
             _context.Restaurants.Add(restaurant);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Edit(int id)
         {
             Restaurant restaurant = await _context.Restaurants.FindAsync(id);
+
             if (restaurant == null)
                 return RedirectToAction(nameof(Index));
+
             RestaurantEdit restaurantEdit = new RestaurantEdit()
             {
                 Id = restaurant.Id,
                 Name = restaurant.Name,
                 Location = restaurant.Location,
             };
-            return View(restaurant);
+
+            return View(restaurantEdit);
         }
 
         [HttpPut]
@@ -87,42 +101,49 @@ namespace RestaurantRaterMVC.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(ModelState);
             }
+
             Restaurant restaurant = await _context.Restaurants.FindAsync(id);
+
             if (restaurant == null)
-                return View(model);
+                return RedirectToAction(nameof(Index));
 
             restaurant.Name = model.Name;
             restaurant.Location = model.Location;
-
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return RedirectToAction(nameof(Restaurant), new { id = restaurant.Id });
         }
 
         public async Task<IActionResult> Delete(int id)
         {
             Restaurant restaurant = await _context.Restaurants.FindAsync(id);
+
             if (restaurant == null)
                 return RedirectToAction(nameof(Index));
-            RestaurantEdit restaurantEdit = new RestaurantEdit()
+
+            RestaurantDetail restaurantDetail = new RestaurantDetail()
             {
                 Id = restaurant.Id,
                 Name = restaurant.Name,
                 Location = restaurant.Location,
             };
-            return View(restaurantEdit);
+
+            return View(restaurantDetail);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteRestaurant(int id)
+        public async Task<IActionResult> Delete(int id, RestaurantDetail model)
         {
-            Restaurant restaurant = await _context.Restaurants.FindAsync(id);
+            Restaurant restaurant = await _context.Restaurants.FindAsync(model.Id);
+
             if (restaurant == null)
                 return RedirectToAction(nameof(Index));
 
             _context.Restaurants.Remove(restaurant);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
     }

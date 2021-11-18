@@ -6,7 +6,7 @@ namespace RestaurantRaterMVC.Models.Restaurant
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        [Display(Name = "Rating")]
+        [Display(Name = "Average Score")]
         public double Score { get; set; }
     }
 }
