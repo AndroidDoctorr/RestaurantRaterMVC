@@ -4,30 +4,28 @@
     ViewData["Title"] = "Rating Index";
 }
 
-<div class="text-center">
-    <h2>Ratings</h2>
-    <p>
-        @Html.ActionLink("Rate A Restaurant", "Create")
-    </p>
-    <table class="table">
+<h1>Ratings</h1>
+<p>
+    @Html.ActionLink("Rate A Restaurant", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.RestaurantName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Score)
+        </th>
+    </tr>
+    @foreach (var item in Model)
+    {
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.RestaurantName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Score)
-            </th>
+            <td>
+                @Html.DisplayFor(modelItem => item.RestaurantName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Score)
+            </td>
         </tr>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RestaurantName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Score)
-                </td>
-            </tr>
-        }
-    </table>
-</div>
+    }
+</table>

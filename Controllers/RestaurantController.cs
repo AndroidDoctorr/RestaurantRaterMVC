@@ -63,8 +63,7 @@ namespace RestaurantRaterMVC.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.errorMessage = ModelState.FirstOrDefault().Value.Errors.FirstOrDefault().ErrorMessage;
-                return View(model);
+                return View();
             }
 
             Restaurant restaurant = new Restaurant()
@@ -96,7 +95,7 @@ namespace RestaurantRaterMVC.Controllers
             return View(restaurantEdit);
         }
 
-        [HttpPut]
+        [HttpPost]
         public async Task<IActionResult> Edit(int id, RestaurantEdit model)
         {
             if (!ModelState.IsValid)
@@ -113,9 +112,10 @@ namespace RestaurantRaterMVC.Controllers
             restaurant.Location = model.Location;
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Restaurant), new { id = restaurant.Id });
+            return RedirectToAction("Details", new { id = restaurant.Id });
         }
 
+        [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
             Restaurant restaurant = await _context.Restaurants.FindAsync(id);
@@ -133,8 +133,8 @@ namespace RestaurantRaterMVC.Controllers
             return View(restaurantDetail);
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int id, RestaurantDetail model)
+        [HttpPost]
+        public async Task<IActionResult> Delete(RestaurantDetail model)
         {
             Restaurant restaurant = await _context.Restaurants.FindAsync(model.Id);
 

@@ -17,13 +17,14 @@ namespace RestaurantRaterMVC.Controllers
 
         public async Task<IActionResult> Index()
         {
-            List<RatingListItem> ratings = _context.Ratings.Select(r => new RatingListItem()
+            IEnumerable<Rating> ratings = _context.Ratings;
+            IEnumerable<RatingListItem> ratingList = ratings.Select(r => new RatingListItem()
             {
                 RestaurantName = r.Restaurant.Name,
                 Score = r.Score,
-            }).ToList();
+            });
 
-            return View(ratings);
+            return View(ratingList);
         }
 
         public async Task<IActionResult> Restaurant(int id)
